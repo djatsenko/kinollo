@@ -23,10 +23,13 @@ app.use(cors({
 app.use(express.json({ limit: '1mb' }));
 app.use(clerkMiddleware());
 
-// Маршруты
-app.get('/health', (_req, res) => res.json({ ok: true }));
+// Health-check
+app.get('/api/health', (_req, res) => res.json({ ok: true }));
+
+// Главная
 app.get('/', (_req, res) => res.send('Server is Live!'));
 
+// Основные маршруты
 app.use('/api/show', showRouter);
 app.use('/api/booking', bookingRouter);
 app.use('/api/admin', adminRouter);

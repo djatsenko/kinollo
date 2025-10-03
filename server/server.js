@@ -15,11 +15,25 @@ const PORT = process.env.PORT || 3000;
 // Подключаем БД
 await connectDB();
 
+// ----- CORS (whitelist) -----
+const allowedOrigins = [
+  'https://kinollo.vercel.app',
+  'http://localhost:5173',
+];
+
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      // Разрешаем запросы без Origin (например, health-check, Postman)
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) return callback(null, true);
+      return callback(new Error('Not allowed by CORS'));
+    },
+    credentials: true,
+  })
+);
+
 // Базовые мидлвары
-app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:5173',
-  credentials: true,
-}));
 app.use(express.json({ limit: '1mb' }));
 app.use(clerkMiddleware());
 
@@ -48,8 +62,8 @@ app.use((err, _req, res, _next) => {
     .json({ success: false, message: err.message || 'Server error' });
 });
 
-app.listen(PORT, () =>
-  console.log(`Server listening at http://localhost:${PORT}`)
-);
+app.listen(PORT, () => {
+  console.log(`Server listening at http://localhost:${PORT}`);
+});
 
 export default app;
